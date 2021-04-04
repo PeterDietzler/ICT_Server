@@ -73,22 +73,25 @@ class ictServer:
     '''
    
     def ict_Loop_Funktion(self, config_data):
-        print('ict_Loop_Funktion()')
-        if self.setAP == True:
-            print('setAP = ', self.setAP)
-            ssid     = config_data['wifi']['AP_ssid']
-            password = config_data['wifi']['AP_password']
-            print('crate_AP_Socket()', ssid, password)
+        print('====== ict_Loop_Funktion() =========')
+        
+        if config_data["wifi"]["setAP"] == 1:
+            print('setAP (True) = ', self.setAP)
+            AP_ssid     = config_data['wifi']['AP_ssid']
+            AP_password = config_data['wifi']['AP_password']
+            print('crate_AP_Socket()', AP_ssid, AP_password)
             
             ap = network.WLAN(network.AP_IF)
             ap.active(True)
-            ap.config(ssid, password)
+            
+            ap.config(essid=AP_ssid, password=AP_password)
+            
             while not ap.active():
                 pass
             print('network config:', ap.ifconfig())
-            
-        else:
-            print('setAP = ', self.setAP)
+            pass
+        elif config_data["wifi"]["setAP"] == 0:
+            print('setAP (Fals) = ', self.setAP)
             ssid     = config_data['wifi']['ssid']
             password = config_data['wifi']['password']
             print('crate_Socket()', ssid, password)
@@ -100,14 +103,18 @@ class ictServer:
                 while not sta.isconnected():
                     pass
             print('network config:', sta.ifconfig())
-
+            pass
+        else:
+            print('ERROR setAP = ', config_data["wifi"]["setAP"])
+            return 0
         # AF_INET - use Internet Protocol v4 addresses
         # SOCK_STREAM means that it is a TCP socket.
         # SOCK_DGRAM means that it is a UDP socket.
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
         soc.listen(5)     # max of 5 socket connections
- 
+        led = 0
+        
         while True:
             # Socket accept() 
             conn, addr = soc.accept()
@@ -131,7 +138,7 @@ class ictServer:
             elif led_off == 6:
                 print('LED OFF')
                 print(str(led_off))
-                led=0
+                led = 0
             response = web_page(led)
             conn.send('HTTP/1.1 200 OK\n')
             conn.send('Content-Type: text/html\n')
