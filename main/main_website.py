@@ -12,13 +12,17 @@ led.off()
 # ************************
 # Function for creating the
 # web page to be displayed
-def web_page():
+def web_page(myled):
+    
+    
+    
     espHall = esp32.hall_sensor()     # read the internal hall sensor
     #espTemperatur = esp32.raw_temperature() # read the internal temperature of the MCU, in Farenheit
     espTemperatur = (esp32.raw_temperature() - 32) * 5/9
     
     
-    if led.value()==1:
+    if myled==1:
+        led.value(1)
         led_state = 'ON'
         print('led is ON')
         R1= 28010
@@ -30,8 +34,9 @@ def web_page():
         R7= 28070
         R8= 28080
  
-    elif led.value()==0:
+    elif myled==0:
         led_state = 'OFF'
+        led.value(0)
         print('led is OFF')
         R1= 2801
         R2= 2802
@@ -49,7 +54,7 @@ def web_page():
           <meta name="viewport" content="width=device-width, initial-scale=1">  
         </head>  
         <body>  
-           <center><h2> """ + myssid +     """ </h2></center>  
+           <center><h2> """ + 'ESP32' +     """ </h2></center>  
            <center><p>Projekt: python-beispiele/microPython/HalloWelt </p></center> 
            <center><p>Hall       : """ + str(espHall) +     """ mT </p></center> 
            <center><p>Temperatur : """ + str(espTemperatur) + """ °C</p></center> 

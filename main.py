@@ -1,7 +1,7 @@
 import ujson
 import utime
 from ota_update.ota_updater import OTAUpdater
-
+from main.ictServer import ictServer
 
 def download_and_install_update_if_available(config_data):
     print('=========== download_and_install_update_if_available() ===============')
@@ -17,10 +17,10 @@ def download_and_install_update_if_available(config_data):
 
 
 def start(config_data):
-    print('=========== start() ===============')
     global s
-    utime.sleep_ms(10000)
+    #utime.sleep_ms(10000)
     from main.ictServer import ictServer
+    print('=========== start() ===============')
     s = ictServer(config_data)
 
 
