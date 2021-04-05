@@ -13,14 +13,9 @@ led.off()
 # Function for creating the
 # web page to be displayed
 def web_page(myled):
-    
-    
-    
     espHall = esp32.hall_sensor()     # read the internal hall sensor
-    #espTemperatur = esp32.raw_temperature() # read the internal temperature of the MCU, in Farenheit
     espTemperatur = (esp32.raw_temperature() - 32) * 5/9
-    
-    
+
     if myled==1:
         led.value(1)
         led_state = 'ON'
@@ -54,8 +49,7 @@ def web_page(myled):
           <meta name="viewport" content="width=device-width, initial-scale=1">  
         </head>  
         <body>  
-           <center><h2> """ + 'ESP32' +     """ </h2></center>  
-           <center><p>Projekt: python-beispiele/microPython/HalloWelt </p></center> 
+           <center><h2> """ + 'ICT-Server' +     """ </h2></center>  
            <center><p>Hall       : """ + str(espHall) +     """ mT </p></center> 
            <center><p>Temperatur : """ + str(espTemperatur) + """ °C</p></center> 
            <center>  
@@ -66,6 +60,7 @@ def web_page(myled):
            </center>  
            <center><p> <strong> Sinus </strong></p></center>  
            <center><p>R1 = <strong>""" + str(R1) + """</strong> R3 = <strong>""" + str(R3) + """</strong></p></center>  
+           <p><src="index.png" width="70" height="137" alt="Selfhtml"> </p>
            <center><p>R2 = <strong>""" + str(R2) + """</strong> R4 = <strong>""" + str(R4) + """</strong></p></center>  
            <center><p> <strong> Cosinus </strong></p></center>  
            <center><p>R5 = <strong>""" + str(R5) + """</strong> R7 = <strong>""" + str(R7) + """</strong></p></center>  

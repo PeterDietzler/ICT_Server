@@ -31,50 +31,9 @@ class ictServer:
             f.close()
             return version
         return '0.0'
-    '''
-    def crate_Socket(self, config_data):
-        print('crate_Socket()')
-        
-        if self.setAP == True:
-            ssid     = config_data['wifi']['AP_ssid']
-            password = config_data['wifi']['AP_password']
-            print('crate_Socket()', ssid, password)
-            
-            ap = network.WLAN(network.AP_IF)
-            ap.active(True)
-            ap.config(ssid, password)
-            while not ap.active():
-                pass
-            print('network config:', ap.ifconfig())
-            # AF_INET - use Internet Protocol v4 addresses
-            # SOCK_STREAM means that it is a TCP socket.
-            # SOCK_DGRAM means that it is a UDP socket.
-            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
-            self.soc.listen(5)     # max of 5 socket connections
-        else:
-            ssid     = config_data['wifi']['ssid']
-            password = config_data['wifi']['password']
-            print('crate_Socket()', ssid, password)
-            sta = network.WLAN(network.STA_IF)
-            if not sta.isconnected():
-                print('connecting to network...')
-                sta.active(True)
-                sta.connect(ssid, password)
-                while not sta.isconnected():
-                    pass
-            print('network config:', sta.ifconfig())
-            # AF_INET - use Internet Protocol v4 addresses
-            # SOCK_STREAM means that it is a TCP socket.
-            # SOCK_DGRAM means that it is a UDP socket.
-            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
-            self.soc.listen(5)     # max of 5 socket connections
-    '''
-   
-    def ict_Loop_Funktion(self, config_data):
-        print('====== ict_Loop_Funktion() =========')
-        
+    
+    def open_Socket(self, config_data):
+        print('open_Socket()')
         if config_data["wifi"]["setAP"] == 1:
             print('setAP (True) = ', self.setAP)
             AP_ssid     = config_data['wifi']['AP_ssid']
@@ -113,8 +72,56 @@ class ictServer:
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
         soc.listen(5)     # max of 5 socket connections
-        led = 0
+        return soc        
+    
+   
+    def ict_Loop_Funktion(self, config_data):
+        print('====== ict_Loop_Funktion() =========')
         
+        '''
+        if config_data["wifi"]["setAP"] == 1:
+            print('setAP (True) = ', self.setAP)
+            AP_ssid     = config_data['wifi']['AP_ssid']
+            AP_password = config_data['wifi']['AP_password']
+            print('crate_AP_Socket()', AP_ssid, AP_password)
+            
+            ap = network.WLAN(network.AP_IF)
+            ap.active(True)
+            
+            ap.config(essid=AP_ssid, password=AP_password)
+            
+            while not ap.active():
+                pass
+            print('network config:', ap.ifconfig())
+            pass
+        elif config_data["wifi"]["setAP"] == 0:
+            print('setAP (Fals) = ', self.setAP)
+            ssid     = config_data['wifi']['ssid']
+            password = config_data['wifi']['password']
+            print('crate_Socket()', ssid, password)
+            sta = network.WLAN(network.STA_IF)
+            if not sta.isconnected():
+                print('connecting to network...')
+                sta.active(True)
+                sta.connect(ssid, password)
+                while not sta.isconnected():
+                    pass
+            print('network config:', sta.ifconfig())
+            pass
+        else:
+            print('ERROR setAP = ', config_data["wifi"]["setAP"])
+            return 0
+        # AF_INET - use Internet Protocol v4 addresses
+        # SOCK_STREAM means that it is a TCP socket.
+        # SOCK_DGRAM means that it is a UDP socket.
+        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
+        soc.listen(5)     # max of 5 socket connections
+        '''
+        soc = self.open_Socket(config_data)
+        
+        led = 0
+
         while True:
             # Socket accept() 
             conn, addr = soc.accept()
