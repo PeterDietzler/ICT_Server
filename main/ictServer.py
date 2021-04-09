@@ -8,6 +8,12 @@ import socket
 from main.main_website import web_page
 from ota_update.ota_updater import OTAUpdater
 
+def check_for_ota_update(config_data):
+    print('Starte ota updater check:')
+    ota = OTAUpdater( config_data['wifi']['gitpath'] )
+    result = ota.check_for_update_to_install_during_next_reboot()
+    #print('ota updater =', result)
+   
 
 class ictServer:
 
@@ -15,7 +21,7 @@ class ictServer:
         
         print('init ictServer()')
         
-        print('Show Aktual main/.version ', self.get_version('main'))
+        #print('Show Aktual main/.version ', self.get_version('main'))
         
         self.setAP = config_data["wifi"]["setAP"]
         print('setAP = ', self.setAP)
@@ -26,6 +32,7 @@ class ictServer:
     
     
     def get_version(self, directory):
+        print("get_version()")
         if '.version' in os.listdir(directory):
             f = open(directory + '/.version')
             version = f.read()
@@ -40,12 +47,9 @@ class ictServer:
             AP_ssid     = config_data['wifi']['AP_ssid']
             AP_password = config_data['wifi']['AP_password']
             print('crate_AP_Socket()', AP_ssid, AP_password)
-            
             ap = network.WLAN(network.AP_IF)
             ap.active(True)
-            
             ap.config(essid=AP_ssid, password=AP_password)
-            
             while not ap.active():
                 pass
             print('network config:', ap.ifconfig())
@@ -64,17 +68,7 @@ class ictServer:
                     pass
             print('network config:', sta.ifconfig())
             
-            
-            print('config ota updater:')
-            ota = OTAUpdater( config_data['wifi']['gitpath'] )
-            print('Starte ota updater check:')
-            result = ota.check_for_update_to_install_during_next_reboot()
-            print('ota updater =', result)
-
-            
-            
-            
-            
+            check_for_ota_update(config_data)  
             pass
         else:
             print('ERROR setAP = ', config_data["wifi"]["setAP"])
@@ -91,48 +85,7 @@ class ictServer:
     def ict_Loop_Funktion(self, config_data):
         print('====== ict_Loop_Funktion() =========')
         
-        '''
-        if config_data["wifi"]["setAP"] == 1:
-            print('setAP (True) = ', self.setAP)
-            AP_ssid     = config_data['wifi']['AP_ssid']
-            AP_password = config_data['wifi']['AP_password']
-            print('crate_AP_Socket()', AP_ssid, AP_password)
-            
-            ap = network.WLAN(network.AP_IF)
-            ap.active(True)
-            
-            ap.config(essid=AP_ssid, password=AP_password)
-            
-            while not ap.active():
-                pass
-            print('network config:', ap.ifconfig())
-            pass
-        elif config_data["wifi"]["setAP"] == 0:
-            print('setAP (Fals) = ', self.setAP)
-            ssid     = config_data['wifi']['ssid']
-            password = config_data['wifi']['password']
-            print('crate_Socket()', ssid, password)
-            sta = network.WLAN(network.STA_IF)
-            if not sta.isconnected():
-                print('connecting to network...')
-                sta.active(True)
-                sta.connect(ssid, password)
-                while not sta.isconnected():
-                    pass
-            print('network config:', sta.ifconfig())
-            pass
-        else:
-            print('ERROR setAP = ', config_data["wifi"]["setAP"])
-            return 0
-        # AF_INET - use Internet Protocol v4 addresses
-        # SOCK_STREAM means that it is a TCP socket.
-        # SOCK_DGRAM means that it is a UDP socket.
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
-        soc.listen(5)     # max of 5 socket connections
-        '''
         soc = self.open_Socket(config_data)
-        
         led = 0
 
         while True:
@@ -159,7 +112,9 @@ class ictServer:
                 print('LED OFF')
                 print(str(led_off))
                 led = 0
+            
             response = web_page(led)
+            
             conn.send('HTTP/1.1 200 OK\n')
             conn.send('Content-Type: text/html\n')
             conn.send('Connection: close\n\n')

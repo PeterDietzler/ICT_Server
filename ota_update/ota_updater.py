@@ -32,7 +32,7 @@ class OTAUpdater:
         -------
             bool: true if a new version is available, false otherwise
         """
-        print('=========== check_for_update_to_install_during_next_reboot() ===============')
+        #print('=========== check_for_update_to_install_during_next_reboot() ===============')
 
         (current_version, latest_version) = self._check_for_new_version()
         
@@ -53,24 +53,14 @@ class OTAUpdater:
         - If yes, it initializes the WIFI connection, downloads the latest version and installs it
         - If no, the WIFI connection is not initialized as no new known version is available
         """
-        print('=========== install_update_if_available_after_boot() ===============')
-
-                
+        #print('==== install_update_if_available_after_boot() ====')
         if self.new_version_dir in os.listdir(self.module):
-            
-            
             if '.version' in os.listdir(self.modulepath(self.new_version_dir)):
-                
-                print('.version found:' )
-                
                 latest_version = self.get_version(self.modulepath(self.new_version_dir), '.version')
                 print('New update found: ', latest_version)
-                
-                
                 OTAUpdater._using_network(ssid, password)
                 self.install_update_if_available()
                 return True
-            
         print('No new updates found...')
         return False
 
@@ -95,7 +85,6 @@ class OTAUpdater:
             self._delete_old_version()
             self._install_new_version()
             return True
-        
         return False
 
 
@@ -114,7 +103,6 @@ class OTAUpdater:
     def _check_for_new_version(self):
         current_version = self.get_version(self.modulepath(self.main_dir))
         latest_version = self.get_latest_version()
-
         print('Checking version... ')
         print('\tCurrent version: ', current_version)
         print('\tLatest version: ', latest_version)
