@@ -6,6 +6,7 @@ import builtins
 import network
 import socket
 from main.main_website import web_page
+from ota_update.ota_updater import OTAUpdater
 
 
 class ictServer:
@@ -62,6 +63,18 @@ class ictServer:
                 while not sta.isconnected():
                     pass
             print('network config:', sta.ifconfig())
+            
+            
+            print('config ota updater:')
+            ota = OTAUpdater( config_data['wifi']['gitpath'] )
+            print('Starte ota updater check:')
+            result = ota.check_for_update_to_install_during_next_reboot()
+            print('ota updater =', result)
+
+            
+            
+            
+            
             pass
         else:
             print('ERROR setAP = ', config_data["wifi"]["setAP"])
