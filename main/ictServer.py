@@ -7,13 +7,37 @@ import network
 import socket
 from main.main_website import web_page
 from ota_update.ota_updater import OTAUpdater
+from machine import RTC
+import ntptime
+import utime
+
+
 
 def check_for_ota_update(config_data):
     print('Starte ota updater check:')
     ota = OTAUpdater( config_data['wifi']['gitpath'] )
     result = ota.check_for_update_to_install_during_next_reboot()
     #print('ota updater =', result)
-   
+
+def initTime():
+    print('initTime()....')
+
+    rtc = RTC()
+    rtc.datetime((2017, 8, 23, 1, 12, 48, 0, 0)) # set a specific date and time
+    print('Time   : ', rtc.datetime()) # get date and time
+
+    # synchronize with ntp
+    # need to be connected to wifi
+    ntptime.settime() # set the rtc datetime from the remote server
+    print('Time(UTC): ', rtc.datetime())    # get the date and time in UTC
+    #print('rtc.now():', rtc.now())
+    print('Time:', utime.gmtime())
+    #print('Time:', utime.localtime())
+    
+    
+    utime
+    
+ 
 
 class ictServer:
 
@@ -46,7 +70,7 @@ class ictServer:
             print('setAP (True) = ', self.setAP)
             AP_ssid     = config_data['wifi']['AP_ssid']
             AP_password = config_data['wifi']['AP_password']
-            print('crate_AP_Socket()', AP_ssid, AP_password)
+            print('crate_AP_Socket()', AP_ssid, "***************")
             ap = network.WLAN(network.AP_IF)
             ap.active(True)
             ap.config(essid=AP_ssid, password=AP_password)
@@ -68,7 +92,8 @@ class ictServer:
                     pass
             print('network config:', sta.ifconfig())
             
-            check_for_ota_update(config_data)  
+            check_for_ota_update(config_data)
+            initTime()
             pass
         else:
             print('ERROR setAP = ', config_data["wifi"]["setAP"])
