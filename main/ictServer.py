@@ -219,7 +219,7 @@ class ictServer:
             print('setAP (Fals) = ', self.setAP)
             ssid     = config_data['wifi']['ssid']
             password = config_data['wifi']['password']
-            print('crate_Socket()', ssid, password)
+            print('crate_Socket()', ssid, "***************")
             sta = network.WLAN(network.STA_IF)
             if not sta.isconnected():
                 print('connecting to network...')
@@ -230,9 +230,9 @@ class ictServer:
             print('network config:', sta.ifconfig())
             
             check_for_ota_update(config_data)
-            initTime()
-            getntptime()
-            get_ntp_time()
+            #initTime()
+            #getntptime()
+            #get_ntp_time()
             resolve_dst_and_set_time()
             print('current Time:', utime.gmtime())
             pass
