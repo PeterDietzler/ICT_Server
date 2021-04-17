@@ -6,13 +6,13 @@ import builtins
 import network
 import socket
 from .main_website import web_page
-from lib.ota_update.ota_updater import OTAUpdater
+from ota_update.ota_updater import OTAUpdater
 from machine import RTC
 import ntptime
 import utime
 
-from bin.get_ntp_time import resolve_dst_and_set_time
-from lib.myWifi.myWiFi import myWiFi
+from main.get_ntp_time import resolve_dst_and_set_time
+from .myWifi.myWiFi import myWiFi
 
 def set_Brauchwasser_Heitzunng():
     # --------  WAS IST ZU BEACHTEN  ---------
@@ -30,7 +30,7 @@ def set_Brauchwasser_Heitzunng():
 
 def check_for_ota_update(config_data):
     print('Starte ota updater check:')
-    ota = OTAUpdater( config_data['wifi']['gitpath'] , main_dir='bin')
+    ota = OTAUpdater( config_data['wifi']['gitpath'] )
     result = ota.check_for_update_to_install_during_next_reboot()
     #print('ota updater =', result)
 

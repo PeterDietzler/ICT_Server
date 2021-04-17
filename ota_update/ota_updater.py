@@ -15,7 +15,6 @@ class OTAUpdater:
         self.main_dir = main_dir
         self.new_version_dir = new_version_dir
         self.secrets_file = secrets_file
-        print('main_dir = ', self.main_dir)
 
     def __del__(self):
         self.http_client = None
@@ -116,8 +115,6 @@ class OTAUpdater:
             versionfile.close()
 
     def get_version(self, directory, version_file_name='.version'):
-        print('directory: ', directory)
-        
         if version_file_name in os.listdir(directory):
             with open(directory + '/' + version_file_name) as f:
                 version = f.read()
