@@ -1,0 +1,40 @@
+{
+ "wifi": {
+    "AP_ssid": "ESP32-AP-WebServer-001F1F08C4CB",
+    "AP_password": "12345678",
+    "MAC": "00:1F:1F:08:C4:CB"
+  },
+  "hotWaterFlowSensor": {
+    "flowPin": 18,
+    "temperatureSensorPin": 35
+  },
+  "coldWaterFlowSensor": {
+    "flowPin": 23,
+    "temperatureSensorPin": 34
+  },
+  "waterLevelSensor": {
+    "lowPin": 16,
+    "highPin": 17
+  },
+  "drainValve": {
+    "openPin": 33,
+    "closePin": 32
+  },
+  "coldWaterSupplyValve": {
+    "openPin": 12,
+    "closePin": 13
+  },
+  "recuperationWaterSupplyValve": {
+    "openPin": 27,
+    "closePin": 14
+  },
+  "waterPump": {
+    "pin": 25
+  },
+  "uvcLamp": {
+    "pin": 26
+  },
+  "byPassButton": {
+    "pin": 18
+  }
+}
