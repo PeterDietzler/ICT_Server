@@ -13,6 +13,7 @@ import utime
 
 from main.get_ntp_time import resolve_dst_and_set_time
 from .myWifi.myWiFi import myWiFi
+from .WWW.myWiFiManager import myWiFiManager
 
 def set_Brauchwasser_Heitzunng():
     # --------  WAS IST ZU BEACHTEN  ---------
@@ -34,84 +35,51 @@ def check_for_ota_update(config_data):
     result = ota.check_for_update_to_install_during_next_reboot()
     #print('ota updater =', result)
 
- 
+
+
+
+	# Plugstat gibt an ob ein Stecker steckt,
+	# Rückgabe ist jeweils 0 oder 1.
+def get_plugstat():
+    return 1
+
+    # Chargestat gibt an, ob EVSEseitig die Ladung aktiv ist
+    # Rückgabe ist jeweils 0 oder 1.
+def get_chargestat():
+    return 1
+
+def get_State_Of_Charge():
+    soc = 23
+    return soc
+
+def set_charge_current( current):
+    print('set_charge_current():', current)
+    
+    
+def getRequest( Value ):
+    html_page = """<!DOCTYPE HTML>  
+        <html>  
+        <head></head>  
+        <body> """ + str(Value) + """ </body>  
+        </html>"""  
+    return html_page
+
+
+
 
 class ictServer:
 
     def __init__(self, config_data):
-        
         print('init ictServer()')
-        
-        #print('Show Aktual main/.version ', self.get_version('main'))
-        
         self.setAP = config_data["wifi"]["setAP"]
         print('setAP = ', self.setAP)
-     
-               
-        self.ict_Loop_Funktion(config_data)
-    
-    
-    def get_version(self, directory):
-        print("get_version()")
-        if '.version' in os.listdir(directory):
-            f = open(directory + '/.version')
-            version = f.read()
-            f.close()
-            return version
-        return '0.0'
-    
-    def open_Socket(self, config_data):
-        print('open_Socket()')
-        if config_data["wifi"]["setAP"] == 1:
-            print('setAP (True) = ', self.setAP)
-            AP_ssid     = config_data['wifi']['AP_ssid']
-            AP_password = config_data['wifi']['AP_password']
-            print('crate_AP_Socket()', AP_ssid, "***************")
-            ap = network.WLAN(network.AP_IF)
-            ap.active(True)
-            ap.config(essid=AP_ssid, password=AP_password)
-            while not ap.active():
-                pass
-            print('network config:', ap.ifconfig())
-            pass
-        elif config_data["wifi"]["setAP"] == 0:
-            print('setAP (Fals) = ', self.setAP)
-            ssid     = config_data['wifi']['ssid']
-            password = config_data['wifi']['password']
-            print('crate_Socket()', ssid, "***************")
-            sta = network.WLAN(network.STA_IF)
-            if not sta.isconnected():
-                print('connecting to network...')
-                sta.active(True)
-                sta.connect(ssid, password)
-                while not sta.isconnected():
-                    pass
-            print('network config:', sta.ifconfig())
-            
-            check_for_ota_update(config_data)
-            #initTime()
-            #getntptime()
-            #get_ntp_time()
-            resolve_dst_and_set_time()
-            print('Current Time:', utime.localtime())
-            
-            pass
-        else:
-            print('ERROR setAP = ', config_data["wifi"]["setAP"])
-            return 0
+        #wifi = myWiFiManager()
+        #wifi.init_WiFiManager()
         
-        # AF_INET - use Internet Protocol v4 addresses
-        # SOCK_STREAM means that it is a TCP socket.
-        # SOCK_DGRAM means that it is a UDP socket.
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
-        soc.listen(5)     # max of 5 socket connections
-        return soc        
-    
-   
+        self.ict_Loop_Funktion(config_data)
+
     def ict_Loop_Funktion(self, config_data):
         print('====== ict_Loop_Funktion() =========')
-        
         if self.setAP == 1:
             ssid     = config_data['wifi']['AP_ssid']
             password = config_data['wifi']['AP_password']
@@ -125,7 +93,7 @@ class ictServer:
             soc = wifi.open_Socket_STA( ssid, password)  
             print('soc:', soc)
             check_for_ota_update(config_data)
-            resolve_dst_and_set_time()
+            #resolve_dst_and_set_time()
             print('Current Time:', utime.localtime())
  
         led = 0
@@ -134,11 +102,13 @@ class ictServer:
             # Socket accept() 
             conn, addr = soc.accept()
                         
+            print("")
+            print("")
             print("Got connection from %s" % str(addr))
 
             # Socket receive()
             request=conn.recv(1024)
-            print("")
+            #print("")
             print("")
             print("Content %s" % str(request))
 
@@ -146,17 +116,50 @@ class ictServer:
             request = str(request)
             led_on = request.find('/?LED=1')
             led_off = request.find('/?LED=0')
-            if led_on == 6:
+            ''' 
+            plugstat = request.find('GET /plugstat')
+            print('plugstat:' , plugstat)
+            
+            chargestat = request.find('GET /chargestat')
+            print('chargestat:' , chargestat)
+            '''
+            
+            if request.find('GET /plugstat') > 0:
+                print('GET /plugstat')
+                plugstat = get_plugstat()
+                response = getRequest( plugstat )
+            
+            elif request.find('GET /chargestat')> 0:
+                print('GET /chargestat')
+                chargestat = get_chargestat()
+                response = getRequest( chargestat )
+            
+            elif request.find('GET /setcurrent?current=')> 0:
+                print('GET /setcurrent?current=')
+                #TODO getValue
+                current = 6.5
+                set_charge_current( current)
+                response = getRequest( current )
+            
+            elif request.find('GET /SoC')> 0:
+                print('GET /SoC')
+                mySOC = get_State_Of_Charge()
+                response = getRequest( mySOC )
+            
+            elif led_on == 6:
                 print('LED ON')
                 print(str(led_on))
                 led = 1
+                response = web_page(led)
             elif led_off == 6:
                 print('LED OFF')
                 print(str(led_off))
                 led = 0
-            
-            response = web_page(led)
-            
+                response = web_page(led)
+            else:
+                print('get NONE')
+                response = getRequest( 0 )
+
             conn.send('HTTP/1.1 200 OK\n')
             conn.send('Content-Type: text/html\n')
             conn.send('Connection: close\n\n')

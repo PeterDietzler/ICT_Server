@@ -1,11 +1,12 @@
+import builtins
 import network
 import socket
 import ure
-import time
+import utime as time
 
 ap_ssid = "WifiManager"
-ap_password = "tayfunulu"
-ap_authmode = 3  # WPA2
+ap_password = "12345678"
+ap_authmode = 0  # WPA2
 
 NETWORK_PROFILES = 'wifi.dat'
 
@@ -17,22 +18,22 @@ server_socket = None
 
 def get_connection():
     """return a working WLAN(STA_IF) instance or None"""
-
+    print('get_connection()...')
     # First check if there already is any connection:
     if wlan_sta.isconnected():
         return wlan_sta
 
     connected = False
     try:
-        # ESP connecting to WiFi takes time, wait a bit and try again:
+        print('  ESP connecting to WiFi takes time, wait a bit and try again:')
         time.sleep(3)
         if wlan_sta.isconnected():
             return wlan_sta
 
-        # Read known network profiles from file
+        print(' Read known network profiles from file')
         profiles = read_profiles()
 
-        # Search WiFis in range
+        print(' # Search WiFis in range ')
         wlan_sta.active(True)
         networks = wlan_sta.scan()
 
@@ -81,16 +82,20 @@ def write_profiles(profiles):
 
 
 def do_connect(ssid, password):
+    print('do_connect()....')
+    print('ssid     ="%s"' % ssid)
+    print('password ="%s"' % password)
+
     wlan_sta.active(True)
     if wlan_sta.isconnected():
         return None
-    print('Trying to connect to %s...' % ssid)
+    print('Trying to connect to "%s"...' % ssid )
     wlan_sta.connect(ssid, password)
     for retry in range(100):
         connected = wlan_sta.isconnected()
         if connected:
             break
-        time.sleep(0.1)
+        time.sleep(0.2)
         print('.', end='')
     if connected:
         print('\nConnected. Network config: ', wlan_sta.ifconfig())
