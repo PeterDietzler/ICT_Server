@@ -57,11 +57,7 @@ def set_charge_current( current):
     
     
 def getRequest( Value ):
-    html_page = """<!DOCTYPE HTML>  
-        <html>  
-        <head></head>  
-        <body> """ + str(Value) + """ </body>  
-        </html>"""  
+    html_page = str(Value)  
     return html_page
 
 
@@ -161,7 +157,7 @@ class ictServer:
                 response = getRequest( 0 )
 
             conn.send('HTTP/1.1 200 OK\n')
-            conn.send('Content-Type: text/html\n')
+            #conn.send('Content-Type: text/html\n')
             conn.send('Connection: close\n\n')
             conn.sendall(response)
 
