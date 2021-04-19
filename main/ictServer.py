@@ -37,7 +37,6 @@ def check_for_ota_update(config_data):
 
 
 
-
 	# Plugstat gibt an ob ein Stecker steckt,
 	# Rückgabe ist jeweils 0 oder 1.
 def get_plugstat():
@@ -49,11 +48,16 @@ def get_chargestat():
     return 1
 
 def get_State_Of_Charge():
-    soc = 23
-    return soc
+    return my_soc
+
+def set_State_Of_Charge(state_of_charge):
+    global my_soc
+    my_soc = state_of_charge
+    return my_soc
 
 def set_charge_current( current):
     print('set_charge_current():', current)
+    return current
     
     
 def getRequest( Value ):
@@ -93,7 +97,8 @@ class ictServer:
             print('Current Time:', utime.localtime())
  
         led = 0
-
+        set_State_Of_Charge(30)
+        
         while True:
             # Socket accept() 
             conn, addr = soc.accept()
@@ -136,12 +141,20 @@ class ictServer:
                 current = 6.5
                 set_charge_current( current)
                 response = getRequest( current )
-            
+
             elif request.find('GET /SoC')> 0:
                 print('GET /SoC')
                 mySOC = get_State_Of_Charge()
                 response = getRequest( mySOC )
             
+            elif request.find('GET /setSoC')> 0:
+                print('GET /SoC')
+                mySOC = get_State_Of_Charge()
+                if mySOC >=100:
+                    mySOC = 0
+                mySOC= set_State_Of_Charge(mySOC +10)
+                response = getRequest( mySOC )
+
             elif led_on == 6:
                 print('LED ON')
                 print(str(led_on))
