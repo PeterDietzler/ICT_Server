@@ -4,16 +4,20 @@ import machine
 import micropython
 import builtins
 import network
-import socket
-from .main_website import web_page
+import usocket as socket
+#from .main_website import web_page
 from ota_update.ota_updater import OTAUpdater
 from machine import RTC
 import ntptime
 import utime
 
 from main.get_ntp_time import resolve_dst_and_set_time
-from .myWifi.myWiFi import myWiFi
-from .WWW.myWiFiManager import myWiFiManager
+#from main.myWifi.myWiFi import myWiFi
+from main.WWW.myWiFiManager import myWiFiManager
+from main.mylibs.myWiFi import myWiFi
+from main.mylibs.shelly import shelly
+from main.mylibs.iobroker import iobroker
+
 
 def set_Brauchwasser_Heitzunng():
     # --------  WAS IST ZU BEACHTEN  ---------
@@ -35,7 +39,8 @@ def check_for_ota_update(config_data):
     result = ota.check_for_update_to_install_during_next_reboot()
     #print('ota updater =', result)
 
-
+def my_map(x, in_min, in_max, out_min, out_max):
+    return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
 	# Plugstat gibt an ob ein Stecker steckt,
 	# Rückgabe ist jeweils 0 oder 1.
@@ -64,9 +69,6 @@ def getRequest( Value ):
     html_page = str(Value)  
     return html_page
 
-
-
-
 class ictServer:
 
     def __init__(self, config_data):
@@ -75,7 +77,22 @@ class ictServer:
         print('setAP = ', self.setAP)
         #wifi = myWiFiManager()
         #wifi.init_WiFiManager()
+
+        ssid     = config_data['wifi']['ssid']
+        password = config_data['wifi']['password']
+        wifi= myWiFi()
+        wifi.connect_WLAN_STA( ssid, password)  
         
+        evu_energie       ='http://iobroker01:8087/getPlainValue/node-red.0.Haus.TotalEnergie'
+        iob=iobroker()
+        iob.get_raw( evu_energie)
+        print('evu_energie = ', iob.get_raw( evu_energie))
+
+        #ip_Heitzung     = '192.168.188.36' # Heizung tempeaturen
+        #heitzung = shelly(ip_Heitzung)
+        #bw_temp = heitzung.get_temperature( 2)
+        #print('bw_temp     = ',bw_temp)
+ 
         self.ict_Loop_Funktion(config_data)
 
     def ict_Loop_Funktion(self, config_data):
@@ -99,7 +116,31 @@ class ictServer:
         led = 0
         set_State_Of_Charge(30)
         
+        ip_pcWohnzimmer = "192.168.188.35"
+        ip_Brauchwasser = "192.168.188.37" # Heizung tempeaturen
+        evu_power         ='http://iobroker01:8087/getPlainValue/node-red.0.EVU.TotalPower'
+        evu_energie       ='http://iobroker01:8087/getPlainValue/node-red.0.Haus.TotalEnergie'
+        evu_ret_energie   ='http://iobroker01:8087/getPlainValue/node-red.0.EVU.EnergieReturned'
+        pv_power          ='http://iobroker01:8087/getPlainValue/node-red.0.PV.Power'
+        pv_energie        ='http://iobroker01:8087/getPlainValue/node-red.0.PV.TotalEnergie'
+        
+        
+        ip_Heitzung     = '192.168.188.36' # Heizung tempeaturen
+        heitzung = shelly(ip_Heitzung)
+        print('-----------------starte while schleife ----------------')
         while True:
+            evu_energie       ='http://iobroker01:8087/getPlainValue/node-red.0.Haus.TotalEnergie'
+            iob=iobroker()
+            print('evu_energie = ', iob.get_raw( evu_energie))
+
+            
+            # AF_INET - use Internet Protocol v4 addresses
+            # SOCK_STREAM means that it is a TCP socket.
+            # SOCK_DGRAM means that it is a UDP socket.
+            soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
+            soc.listen(5)     # max of 5 socket connections
+            
             # Socket accept() 
             conn, addr = soc.accept()
                         
@@ -144,7 +185,6 @@ class ictServer:
 
             elif request.find('GET /SoC')> 0:
                 print('GET /SoC')
-                mySOC = get_State_Of_Charge()
                 response = getRequest( mySOC )
             
             elif request.find('GET /setSoC')> 0:
@@ -176,4 +216,7 @@ class ictServer:
 
             # Socket close()
             conn.close()
+            soc.close()
+            
+            
             

@@ -1,6 +1,6 @@
-import builtins
+#import builtins
 import network
-import socket
+import usocket as socket
 
 
 class myWiFi:
@@ -104,3 +104,14 @@ class myWiFi:
         soc.bind(('',80)) # specifies that the socket is reachable by any address the machine happens to have
         soc.listen(5)     # max of 5 socket connections
         return soc        
+   
+   def connect_WLAN_STA( self, ssid, password ):
+        print('crate_Socket()', ssid, "***************")
+        sta = network.WLAN(network.STA_IF)
+        if not sta.isconnected():
+            print('connecting to network...')
+            sta.active(True)
+            sta.connect(ssid, password)
+            while not sta.isconnected():
+                pass
+        print('network config:', sta.ifconfig())
