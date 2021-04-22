@@ -1,4 +1,11 @@
-import usocket, os
+try:
+    import usocket
+    import os
+except:
+    import socket, os
+
+
+
 class Response:
 
     def __init__(self, socket, saveToFile=None):

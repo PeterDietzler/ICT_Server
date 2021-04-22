@@ -1,5 +1,10 @@
-import ujson
-import utime
+try:
+    import ujson
+    import utime
+except:
+    import json
+    import time
+
 from ota_update.ota_updater import OTAUpdater
 from main.ictServer import ictServer
 

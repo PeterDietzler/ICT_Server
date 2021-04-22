@@ -1,4 +1,4 @@
-import urequests as requests
+import requests
 import ujson as json
 class shelly:
     def __init__(self, ip_address, user='', password=''):

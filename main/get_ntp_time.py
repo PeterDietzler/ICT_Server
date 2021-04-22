@@ -1,6 +1,10 @@
-from machine import RTC
-import ntptime
-import utime
+try:
+    from machine import RTC
+    import ntptime
+    import utime
+except:
+    import json
+    import time
 
 
 def initTime():

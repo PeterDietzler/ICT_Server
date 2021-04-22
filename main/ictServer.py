@@ -1,15 +1,20 @@
-import utime
+try: # Micropython
+    import utime
+    import machine
+    from machine import RTC
+    import micropython
+    import usocket as socket
+    import ntptime
+except:
+    import socket
+    import time
+    pass
+
 import os
-import machine
-import micropython
 import builtins
 import network
-import usocket as socket
 #from .main_website import web_page
-from ota_update.ota_updater import OTAUpdater
-from machine import RTC
-import ntptime
-import utime
+#from ota_update.ota_updater import OTAUpdater
 
 from main.get_ntp_time import resolve_dst_and_set_time
 #from main.myWifi.myWiFi import myWiFi
@@ -17,6 +22,7 @@ from main.WWW.myWiFiManager import myWiFiManager
 from main.mylibs.myWiFi import myWiFi
 from main.mylibs.shelly import shelly
 from main.mylibs.iobroker import iobroker
+global my_soc
 
 
 def set_Brauchwasser_Heitzunng():
@@ -57,6 +63,7 @@ def get_State_Of_Charge():
 
 def set_State_Of_Charge(state_of_charge):
     global my_soc
+    
     my_soc = state_of_charge
     return my_soc
 
@@ -82,7 +89,7 @@ class ictServer:
         password = config_data['wifi']['password']
         wifi= myWiFi()
         wifi.connect_WLAN_STA( ssid, password)  
-        
+
         evu_energie       ='http://iobroker01:8087/getPlainValue/node-red.0.Haus.TotalEnergie'
         iob=iobroker()
         iob.get_raw( evu_energie)
